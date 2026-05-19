@@ -19,9 +19,9 @@
             --font-color: #a0a5b5;
             --font-light: #626875;
             
-            /* Dinamički parametri koje menjaju klizači */
+            /* Dinamički parametri koje menjaju slajderi */
             --accent-color: #ff3b00;
-            --accent-blur: rgba(255, 59, 0, 0.2);
+            --accent-blur: rgba(255, 59, 0, 0.25);
             --shadow-blur: 16px;
             --shadow-size: 9px;
             --shadow-dark-opacity: 1.0;
@@ -29,7 +29,7 @@
             --shadow-inset-intensity: 3px;
             --card-radius: 40px;
             
-            /* Proračun senki na osnovu klizača */
+            /* Formule za generisanje 3D efekata */
             --outer-shadow: calc(var(--shadow-size) * 1) calc(var(--shadow-size) * 1) var(--shadow-blur) rgba(18, 19, 22, var(--shadow-dark-opacity)), 
                             calc(var(--shadow-size) * -1) calc(var(--shadow-size) * -1) var(--shadow-blur) rgba(42, 45, 50, var(--shadow-light-opacity));
             
@@ -69,7 +69,6 @@
             flex-wrap: wrap;
         }
 
-        /* FIKSIRANA VELIČINA ZA SVE EKRANE */
         .player-card {
             background: var(--surface-color);
             border-radius: var(--card-radius);
@@ -85,7 +84,7 @@
             transition: box-shadow 0.3s ease, border-radius 0.2s ease;
         }
 
-        /* AMBILIGHT EFEKAT */
+        /* AMBILIGHT SVETLO IZA PLEJERA */
         .player-card.playing-glow::before {
             content: '';
             position: absolute;
@@ -97,8 +96,8 @@
         }
 
         @keyframes pulseGlow {
-            0% { opacity: 0.5; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1.05); }
+            0% { opacity: 0.4; transform: scale(0.95); }
+            100% { opacity: 0.9; transform: scale(1.05); }
         }
 
         .player-card * {
@@ -277,46 +276,37 @@
             box-shadow: 0px 5px 15px var(--accent-blur);
         }
 
-        /* 3D DIZAJN ZA INPUTE - POTPUNO SKRIVEN FABRIČKI TEKST */
+        /* SEKCIJA ZA UVOZ I LISTU */
         .upload-section {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
             width: 100%;
             margin-bottom: 15px;
         }
 
         .custom-file-input {
             width: 100%;
-            height: 44px;
+            height: 48px;
             background: var(--surface-color);
-            border-radius: 15px;
+            border-radius: 20px;
             box-shadow: var(--button-shadow);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             font-size: 12px;
-            font-weight: 600;
-            color: var(--font-color);
-            transition: all 0.2s ease;
+            font-weight: 700;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
 
-        .custom-file-input:active {
-            box-shadow: var(--inner-shadow);
-        }
+        .custom-file-input:active { box-shadow: var(--inner-shadow); }
+        .custom-file-input input[type="file"] { display: none; }
 
-        .custom-file-input input[type="file"] {
-            display: none;
-        }
-
-        /* LISTA MEDIJA */
         .track-list {
             width: 100%;
-            height: 150px;
+            height: 160px;
             overflow-y: auto;
             padding-right: 3px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .track-list::-webkit-scrollbar { width: 4px; }
@@ -342,7 +332,7 @@
         .item-details {
             display: flex;
             flex-direction: column;
-            max-width: 80%;
+            max-width: 85%;
             overflow: hidden;
         }
 
@@ -357,16 +347,16 @@
 
         .item-type { font-size: 10px; color: var(--font-light); text-transform: uppercase; margin-top: 2px;}
 
-        /* KONTROLNA TABLA SA KLIZAČIMA */
+        /* NEOMORFNI 3D KONTROLNI PANEL ZA LIVE PODEŠAVANJA */
         .settings-panel {
             width: 100%;
-            height: 250px;
+            height: 240px;
             overflow-y: auto;
             padding-top: 5px;
         }
 
         .slider-group {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             width: 100%;
         }
 
@@ -404,25 +394,24 @@
             align-items: center;
             justify-content: space-between;
             background: #151619;
-            padding: 8px 12px;
-            border-radius: 12px;
+            padding: 10px 14px;
+            border-radius: 15px;
             box-shadow: var(--inner-shadow);
-            margin-top: 5px;
         }
 
         .color-input {
             -webkit-appearance: none;
             border: none;
-            width: 40px;
-            height: 24px;
-            border-radius: 5px;
+            width: 45px;
+            height: 25px;
+            border-radius: 6px;
             cursor: pointer;
             background: none;
         }
         
         .color-input::-webkit-color-swatch {
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             box-shadow: var(--button-shadow);
         }
 
@@ -436,7 +425,7 @@
     <div class="player-card" id="main-card">
         <div class="header-nav">
             <button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/></svg></button>
-            <div class="header-title">3D Plejer</div>
+            <div class="header-title">Trenutno svira</div>
             <button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M6,13H18V11H6M6,17H18V15H6M6,9H18V7H6V9Z"/></svg></button>
         </div>
 
@@ -450,8 +439,8 @@
         </div>
 
         <div class="track-info">
-            <div class="track-title" id="display-title">Nema medija</div>
-            <div class="track-artist" id="display-artist">Uvezi fajlove na desnom ekranu</div>
+            <div class="track-title" id="display-title">Nema pesama</div>
+            <div class="track-artist" id="display-artist">Uvezi folder sa desne strane</div>
         </div>
 
         <div class="progress-container">
@@ -477,21 +466,13 @@
 
     <div class="player-card">
         <div class="header-nav">
-            <div class="header-title" style="margin-left: auto; margin-right: auto;">Mediji i 3D Podešavanja</div>
+            <div class="header-title" style="margin-left: auto; margin-right: auto;">Mediji i 3D Kontrole</div>
         </div>
 
         <div class="upload-section">
-            <label class="custom-file-input" style="background: linear-gradient(135deg, #2a2d32, #1e2024); border: 1px solid #32363e;">
-                📁 Uvezi CEO FOLDER (Muzika + Video)
+            <label class="custom-file-input">
+                📁 UČITAJ LOKALNI FOLDER ODJEDNOM
                 <input type="file" id="folder-upload" webkitdirectory directory multiple>
-            </label>
-            <label class="custom-file-input">
-                🎵 Izaberi pojedinačne MP3 pesme
-                <input type="file" id="file-upload" multiple accept="audio/*">
-            </label>
-            <label class="custom-file-input">
-                📹 Izaberi pojedinačne MP4 snimke
-                <input type="file" id="video-upload" multiple accept="video/*">
             </label>
         </div>
 
@@ -500,12 +481,12 @@
         <div class="settings-panel">
             <div class="slider-group">
                 <div class="color-picker-wrapper">
-                    <span style="font-size: 11px; font-weight:600;">Izaberi RGB Boju Svetla:</span>
+                    <span style="font-size: 11px; font-weight:700; color:#e2e8f0;">Promena RGB Boje Akcenta:</span>
                     <input type="color" id="rgb-color" class="color-input" value="#ff3b00">
                 </div>
             </div>
             <div class="slider-group">
-                <div class="slider-label"><span>Dubina / Isturenost Senki</span><span id="val-size">9px</span></div>
+                <div class="slider-label"><span>Visina / Isturenost Senki</span><span id="val-size">9px</span></div>
                 <input type="range" id="slide-size" class="native-slider" min="1" max="20" value="9">
             </div>
             <div class="slider-group">
@@ -513,7 +494,7 @@
                 <input type="range" id="slide-blur" class="native-slider" min="2" max="35" value="16">
             </div>
             <div class="slider-group">
-                <div class="slider-label"><span>Urez / Intenzitet Unutrašnjih Senki</span><span id="val-inset">3px</span></div>
+                <div class="slider-label"><span>Dubina ureza (Inset)</span><span id="val-inset">3px</span></div>
                 <input type="range" id="slide-inset" class="native-slider" min="1" max="10" value="3">
             </div>
             <div class="slider-group">
@@ -525,7 +506,7 @@
                 <input type="range" id="slide-light" class="native-slider" min="2" max="10" value="10">
             </div>
             <div class="slider-group">
-                <div class="slider-label"><span>Zaobljenost Ivica Plejera</span><span id="val-radius">40px</span></div>
+                <div class="slider-label"><span>Zaobljenost Ćoškova</span><span id="val-radius">40px</span></div>
                 <input type="range" id="slide-radius" class="native-slider" min="10" max="60" value="40">
             </div>
         </div>
@@ -546,8 +527,6 @@
     let isPlaying = false;
 
     const folderUpload = document.getElementById('folder-upload');
-    const fileUpload = document.getElementById('file-upload');
-    const videoUpload = document.getElementById('video-upload');
     const playlistContainer = document.getElementById('playlist-container');
     const displayTitle = document.getElementById('display-title');
     const displayArtist = document.getElementById('display-artist');
@@ -563,76 +542,38 @@
     const playPath = "M8,5.14V19.14L19,12.14L8,5.14Z";
     const pausePath = "M14,19H18V5H14M6,19H10V5H6V19Z";
 
-    // OBRADA UVOZA CELOG FOLDERA
     folderUpload.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
-        let addedCount = 0;
-
+        playlist = [];
+        
         files.forEach((file) => {
             const type = file.type;
+            const nameLower = file.name.toLowerCase();
             const cleanName = file.name.replace(/\.[^/.]+$/, "");
             
-            // Provera da li je audio
-            if (type.startsWith('audio/') || file.name.endsWith('.mp3') || file.name.endsWith('.wav') || file.name.endsWith('.m4a')) {
+            if (type.startsWith('audio/') || nameLower.endsWith('.mp3') || nameLower.endsWith('.wav') || nameLower.endsWith('.m4a')) {
                 const parts = cleanName.split('-');
                 playlist.push({
                     title: parts.length > 1 ? parts[1].trim() : parts[0].trim(),
-                    artist: parts.length > 1 ? parts[0].trim() : "Folder Muzika",
+                    artist: parts.length > 1 ? parts[0].trim() : "Audio fajl",
                     url: URL.createObjectURL(file),
                     type: 'audio'
                 });
-                addedCount++;
-            } 
-            // Provera da li je video
-            else if (type.startsWith('video/') || file.name.endsWith('.mp4') || file.name.endsWith('.mkv') || file.name.endsWith('.mov')) {
+            } else if (type.startsWith('video/') || nameLower.endsWith('.mp4') || nameLower.endsWith('.mkv') || nameLower.endsWith('.mov')) {
                 playlist.push({
                     title: cleanName,
-                    artist: "Folder Video",
+                    artist: "Video Snimak",
                     url: URL.createObjectURL(file),
                     type: 'video'
                 });
-                addedCount++;
             }
         });
 
-        if (addedCount > 0) {
-            currentIndex = playlist.length - addedCount;
+        if (playlist.length > 0) {
+            currentIndex = 0;
             loadTrack(currentIndex);
             renderPlaylist();
         }
-    });
-
-    // POJEDINAČNI UNOS MUZIKE
-    fileUpload.addEventListener('change', (e) => {
-        const files = Array.from(e.target.files);
-        files.forEach((file) => {
-            const cleanName = file.name.replace(/\.[^/.]+$/, "");
-            const parts = cleanName.split('-');
-            playlist.push({
-                title: parts.length > 1 ? parts[1].trim() : parts[0].trim(),
-                artist: parts.length > 1 ? parts[0].trim() : "Muzička numera",
-                url: URL.createObjectURL(file),
-                type: 'audio'
-            });
-        });
-        if(playlist.length === files.length) { currentIndex = 0; loadTrack(currentIndex); }
-        renderPlaylist();
-    });
-
-    // POJEDINAČNI UNOS VIDEO SNIMAKA
-    videoUpload.addEventListener('change', (e) => {
-        const files = Array.from(e.target.files);
-        files.forEach((file) => {
-            const cleanName = file.name.replace(/\.[^/.]+$/, "");
-            playlist.push({
-                title: cleanName,
-                artist: "Video Snimak",
-                url: URL.createObjectURL(file),
-                type: 'video'
-            });
-        });
-        if(playlist.length === files.length) { currentIndex = 0; loadTrack(currentIndex); }
-        renderPlaylist();
     });
 
     function renderPlaylist() {
@@ -645,7 +586,7 @@
                     <span class="item-title">${track.title}</span>
                     <span class="item-type">${track.type === 'video' ? '📹 ' + track.artist : '🎵 ' + track.artist}</span>
                 </div>
-                <div style="color: var(--accent-color); font-size:11px;">${index === currentIndex && isPlaying ? '►' : ''}</div>
+                <div style="color: var(--accent-color); font-size:12px; font-weight:bold;">${index === currentIndex && isPlaying ? '●' : ''}</div>
             `;
             row.addEventListener('click', () => { currentIndex = index; loadTrack(currentIndex); playMedia(); });
             playlistContainer.appendChild(row);
@@ -654,30 +595,19 @@
 
     function loadTrack(index) {
         if (!playlist[index]) return;
-        
-        audio.pause();
-        video.pause();
-        
+        audio.pause(); video.pause();
         const current = playlist[index];
         displayTitle.innerText = current.title;
         displayArtist.innerText = current.artist;
 
         if (current.type === 'video') {
-            video.src = current.url;
-            video.style.display = 'block';
-            fallbackArt.style.display = 'none';
-            video.ontimeupdate = updateProgressLayoutVideo;
+            video.src = current.url; video.style.display = 'block'; fallbackArt.style.display = 'none';
+            video.ontimeupdate = updateProgressVideo;
         } else {
-            audio.src = current.url;
-            video.style.display = 'none';
-            fallbackArt.style.display = 'flex';
-            video.src = '';
-            audio.ontimeupdate = updateProgressLayoutAudio;
+            audio.src = current.url; video.style.display = 'none'; fallbackArt.style.display = 'flex';
+            video.src = ''; audio.ontimeupdate = updateProgressAudio;
         }
-
-        const items = playlistContainer.querySelectorAll('.list-item');
-        items.forEach(item => item.classList.remove('active'));
-        if (items[index]) items[index].classList.add('active');
+        renderPlaylist();
         progressBar.style.width = '0%';
     }
 
@@ -686,67 +616,43 @@
         isPlaying = true;
         playIcon.setAttribute('d', pausePath);
         mainCard.classList.add('playing-glow');
-
-        if (playlist[currentIndex].type === 'video') {
-            video.play().catch(() => {});
-        } else {
-            audio.play().catch(() => {});
-        }
+        if (playlist[currentIndex].type === 'video') video.play().catch(()=>{}); else audio.play().catch(()=>{});
+        renderPlaylist();
     }
 
     function pauseMedia() {
         isPlaying = false;
         playIcon.setAttribute('d', playPath);
         mainCard.classList.remove('playing-glow');
-        audio.pause();
-        video.pause();
+        audio.pause(); video.pause();
+        renderPlaylist();
     }
 
     btnPlay.addEventListener('click', () => isPlaying ? pauseMedia() : playMedia());
-    
-    function nextMedia() {
-        if(playlist.length === 0) return;
-        currentIndex = (currentIndex + 1) % playlist.length;
-        loadTrack(currentIndex);
-        if (isPlaying) playMedia();
-    }
+    btnNext.addEventListener('click', () => { currentIndex = (currentIndex + 1) % playlist.length; loadTrack(currentIndex); if(isPlaying) playMedia(); });
+    btnPrev.addEventListener('click', () => { currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; loadTrack(currentIndex); if(isPlaying) playMedia(); });
+    audio.addEventListener('ended', () => btnNext.click());
+    video.addEventListener('ended', () => btnNext.click());
 
-    function prevMedia() {
-        if(playlist.length === 0) return;
-        currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-        loadTrack(currentIndex);
-        if (isPlaying) playMedia();
-    }
-
-    btnNext.addEventListener('click', nextMedia);
-    btnPrev.addEventListener('click', prevMedia);
-    
-    audio.addEventListener('ended', nextMedia);
-    video.addEventListener('ended', nextMedia);
-
-    function updateProgressLayoutAudio() {
+    function updateProgressAudio() {
         if (audio.duration) {
             progressBar.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
-            currentTimeEl.innerText = formatTime(audio.currentTime);
-            durationTimeEl.innerText = formatTime(audio.duration);
+            currentTimeEl.innerText = formatTime(audio.currentTime); durationTimeEl.innerText = formatTime(audio.duration);
         }
     }
-
-    function updateProgressLayoutVideo() {
+    function updateProgressVideo() {
         if (video.duration) {
             progressBar.style.width = `${(video.currentTime / video.duration) * 100}%`;
-            currentTimeEl.innerText = formatTime(video.currentTime);
-            durationTimeEl.innerText = formatTime(video.duration);
+            currentTimeEl.innerText = formatTime(video.currentTime); durationTimeEl.innerText = formatTime(video.duration);
         }
     }
 
     sliderBox.addEventListener('click', (e) => {
         if (playlist.length === 0) return;
-        const current = playlist[currentIndex];
-        if (current.type === 'video' && video.duration) {
-            video.currentTime = (e.offsetX / sliderBox.clientWidth) * video.duration;
-        } else if (current.type === 'audio' && audio.duration) {
-            audio.currentTime = (e.offsetX / sliderBox.clientWidth) * audio.duration;
+        const dur = playlist[currentIndex].type === 'video' ? video.duration : audio.duration;
+        if (dur) {
+            const time = (e.offsetX / sliderBox.clientWidth) * dur;
+            if (playlist[currentIndex].type === 'video') video.currentTime = time; else audio.currentTime = time;
         }
     });
 
@@ -755,7 +661,7 @@
         return `${m}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
-    // ŽIVA KONTROLA KLIZAČA
+    // SLIDERI ZA KONTROLU 3D IZGLEDA I RGB SENKI U REALNOM VREMENU
     const root = document.documentElement;
 
     document.getElementById('rgb-color').addEventListener('input', (e) => {
