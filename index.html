@@ -2,8 +2,8 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Neumorphic MP3 Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D Neumorphic Media Player</title>
     
     <meta name="theme-color" content="#1e2024">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,13 +18,25 @@
             --surface-color: #1e2024;
             --font-color: #a0a5b5;
             --font-light: #626875;
-            --accent-color: #ff3b00;
-            --accent-gradient: linear-gradient(135deg, #ff5100, #d63000);
             
-            /* Precizne 3D neomorfne senke */
-            --outer-shadow: 9px 9px 16px #121316, -9px -9px 16px #2a2d32;
-            --inner-shadow: inset 3px 3px 7px #121316, inset -3px -3px 7px #2a2d32;
-            --button-shadow: 6px 6px 12px #121316, -6px -6px 12px #2a2d32;
+            /* Dinamički parametri koje menjaju klizači */
+            --accent-color: #ff3b00;
+            --accent-blur: rgba(255, 59, 0, 0.2);
+            --shadow-blur: 16px;
+            --shadow-size: 9px;
+            --shadow-dark-opacity: 1.0;
+            --shadow-light-opacity: 1.0;
+            --shadow-inset-intensity: 3px;
+            --card-radius: 40px;
+            
+            /* Proračun senki na osnovu klizača */
+            --outer-shadow: calc(var(--shadow-size) * 1) calc(var(--shadow-size) * 1) var(--shadow-blur) rgba(18, 19, 22, var(--shadow-dark-opacity)), 
+                            calc(var(--shadow-size) * -1) calc(var(--shadow-size) * -1) var(--shadow-blur) rgba(42, 45, 50, var(--shadow-light-opacity));
+            
+            --inner-shadow: inset var(--shadow-inset-intensity) var(--shadow-inset-intensity) 7px rgba(18, 19, 22, 0.8), 
+                            inset calc(var(--shadow-inset-intensity) * -1) calc(var(--shadow-inset-intensity) * -1) 7px rgba(42, 45, 50, 0.8);
+            
+            --button-shadow: 6px 6px 12px rgba(18, 19, 22, var(--shadow-dark-opacity)), -6px -6px 12px rgba(42, 45, 50, var(--shadow-light-opacity));
             --button-active: inset 4px 4px 8px #121316, inset -4px -4px 8px #2a2d32;
         }
 
@@ -32,8 +44,9 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         body {
@@ -43,29 +56,54 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
+            overflow-x: hidden;
         }
 
         .app-container {
             display: flex;
-            gap: 40px;
-            max-width: 900px;
+            gap: 25px;
+            max-width: 760px;
             width: 100%;
             justify-content: center;
             flex-wrap: wrap;
         }
 
+        /* FIKSIRANA VELIČINA ZA SVE EKRANE */
         .player-card {
             background: var(--surface-color);
-            border-radius: 40px;
-            padding: 30px;
+            border-radius: var(--card-radius);
+            padding: 25px;
             width: 360px;
-            min-height: 590px;
+            height: 640px;
             box-shadow: var(--outer-shadow);
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease, border-radius 0.2s ease;
+        }
+
+        /* AMBILIGHT EFEKAT */
+        .player-card.playing-glow::before {
+            content: '';
+            position: absolute;
+            top: -10%; left: -10%; right: -10%; bottom: -10%;
+            background: radial-gradient(circle, var(--accent-blur) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+            animation: pulseGlow 4s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .player-card * {
+            position: relative;
+            z-index: 1;
         }
 
         .header-nav {
@@ -73,7 +111,7 @@
             width: 100%;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .nav-btn {
@@ -88,12 +126,9 @@
             align-items: center;
             cursor: pointer;
             color: var(--font-color);
-            transition: all 0.2s ease;
         }
 
-        .nav-btn:active {
-            box-shadow: var(--button-active);
-        }
+        .nav-btn:active { box-shadow: var(--button-active); }
 
         .header-title {
             font-size: 11px;
@@ -103,17 +138,16 @@
             font-weight: bold;
         }
 
-        /* 3D Krug za statični video */
         .album-art-wrapper {
-            width: 220px;
-            height: 220px;
+            width: 210px;
+            height: 210px;
             border-radius: 50%;
             background: var(--surface-color);
             box-shadow: var(--outer-shadow);
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
             padding: 12px;
         }
 
@@ -127,7 +161,6 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            position: relative;
         }
 
         .album-video {
@@ -136,41 +169,28 @@
             object-fit: cover;
             border-radius: 50%;
             display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
         }
 
         .album-art-fallback {
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, #2a1108 0%, #121316 80%);
+            background: radial-gradient(circle, #22252a 0%, #121316 80%);
             display: flex;
             justify-content: center;
             align-items: center;
-            position: absolute;
-        }
-
-        .album-art-fallback::before {
-            content: '';
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--surface-color);
-            box-shadow: var(--outer-shadow), var(--inner-shadow);
         }
 
         .track-info {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             width: 100%;
         }
 
         .track-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             color: #e2e8f0;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -180,12 +200,11 @@
         .track-artist {
             font-size: 13px;
             color: var(--font-light);
-            font-weight: 500;
         }
 
         .progress-container {
             width: 100%;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .time-stamps {
@@ -193,8 +212,7 @@
             justify-content: space-between;
             font-size: 11px;
             color: var(--font-light);
-            margin-bottom: 12px;
-            padding: 0 5px;
+            margin-bottom: 10px;
         }
 
         .slider-wrapper {
@@ -203,16 +221,15 @@
             background: #151619;
             border-radius: 10px;
             box-shadow: var(--inner-shadow);
+            cursor: pointer;
             position: relative;
-            display: flex;
-            align-items: center;
         }
 
         .progress-bar {
             height: 100%;
             width: 0%;
             border-radius: 10px;
-            background: var(--accent-gradient);
+            background: var(--accent-color);
             position: relative;
         }
 
@@ -223,21 +240,8 @@
             background: var(--surface-color);
             box-shadow: var(--button-shadow);
             position: absolute;
-            right: -8px;
-            top: 50%;
+            right: -8px; top: 50%;
             transform: translateY(-50%);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .progress-handle::after {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--accent-color);
         }
 
         .controls {
@@ -245,7 +249,7 @@
             width: 100%;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 15px;
             margin-top: auto;
         }
 
@@ -259,158 +263,195 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            color: var(--font-color);
             cursor: pointer;
+        }
+
+        .control-btn:active { box-shadow: var(--button-active); }
+
+        .control-btn.play-main {
+            width: 70px;
+            height: 70px;
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0px 5px 15px var(--accent-blur);
+        }
+
+        /* 3D DIZAJN ZA INPUTE - POTPUNO SKRIVEN FABRIČKI TEKST */
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .custom-file-input {
+            width: 100%;
+            height: 44px;
+            background: var(--surface-color);
+            border-radius: 15px;
+            box-shadow: var(--button-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
             color: var(--font-color);
             transition: all 0.2s ease;
         }
 
-        .control-btn:active {
-            box-shadow: var(--button-active);
-        }
-
-        .control-btn.play-main {
-            width: 75px;
-            height: 75px;
-            background: var(--accent-gradient);
-            color: white;
-            box-shadow: 5px 5px 12px #100400, -5px -5px 12px #2a2d32, inset 2px 2px 4px rgba(255,255,255,0.2);
-        }
-
-        .control-btn.play-main:active {
-            box-shadow: inset 4px 4px 10px rgba(0,0,0,0.5);
-        }
-
-        .upload-section {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .file-selector-box {
-            flex: 1;
-            padding: 12px 5px;
-            background: #151619;
-            border-radius: 15px;
+        .custom-file-input:active {
             box-shadow: var(--inner-shadow);
-            text-align: center;
         }
 
-        .file-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--font-color);
-            cursor: pointer;
-            display: block;
+        .custom-file-input input[type="file"] {
+            display: none;
         }
 
+        /* LISTA MEDIJA */
         .track-list {
             width: 100%;
-            height: 310px;
+            height: 150px;
             overflow-y: auto;
-            padding-right: 5px;
+            padding-right: 3px;
+            margin-bottom: 10px;
         }
 
-        .track-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        .track-list::-webkit-scrollbar-track {
-            background: #151619;
-            border-radius: 10px;
-        }
-        .track-list::-webkit-scrollbar-thumb {
-            background: #2a2d32;
-            border-radius: 10px;
-        }
+        .track-list::-webkit-scrollbar { width: 4px; }
+        .track-list::-webkit-scrollbar-thumb { background: #2a2d32; border-radius: 10px; }
 
         .list-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 20px;
-            border-radius: 20px;
-            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
             cursor: pointer;
             background: var(--surface-color);
             box-shadow: var(--button-shadow);
-            transition: all 0.2s ease;
         }
 
         .list-item.active {
             box-shadow: var(--inner-shadow);
-            background: #18191c;
+            background: #191a1d;
         }
 
         .item-details {
             display: flex;
             flex-direction: column;
-            max-width: 75%;
+            max-width: 80%;
+            overflow: hidden;
         }
 
         .item-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #e2e8f0;
-            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .item-artist {
-            font-size: 11px;
-            color: var(--font-light);
+        .item-type { font-size: 10px; color: var(--font-light); text-transform: uppercase; margin-top: 2px;}
+
+        /* KONTROLNA TABLA SA KLIZAČIMA */
+        .settings-panel {
+            width: 100%;
+            height: 250px;
+            overflow-y: auto;
+            padding-top: 5px;
         }
 
-        .item-play-status {
-            width: 28px;
-            height: 28px;
+        .slider-group {
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--font-light);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .native-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            background: #151619;
+            height: 6px;
+            border-radius: 5px;
+            box-shadow: var(--inner-shadow);
+            outline: none;
+        }
+
+        .native-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px; height: 16px;
             border-radius: 50%;
             background: var(--surface-color);
             box-shadow: var(--button-shadow);
+            cursor: pointer;
+            border: 2px solid var(--font-light);
+        }
+
+        .color-picker-wrapper {
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+            background: #151619;
+            padding: 8px 12px;
+            border-radius: 12px;
+            box-shadow: var(--inner-shadow);
+            margin-top: 5px;
         }
 
-        .list-item.active .item-play-status {
-            background: var(--accent-gradient);
-            color: white;
-            box-shadow: none;
+        .color-input {
+            -webkit-appearance: none;
+            border: none;
+            width: 40px;
+            height: 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            background: none;
+        }
+        
+        .color-input::-webkit-color-swatch {
+            border: none;
+            border-radius: 5px;
+            box-shadow: var(--button-shadow);
         }
 
-        svg {
-            fill: currentColor;
-            width: 18px;
-            height: 18px;
-        }
+        svg { fill: currentColor; width: 16px; height: 16px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
 
-    <div class="player-card">
+    <div class="player-card" id="main-card">
         <div class="header-nav">
-            <button class="nav-btn">
-                <svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/></svg>
-            </button>
-            <div class="header-title">Trenutno svira</div>
-            <button class="nav-btn">
-                <svg viewBox="0 0 24 24"><path d="M6,13H18V11H6M6,17H18V15H6M6,9H18V7H6V9Z"/></svg>
-            </button>
+            <button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/></svg></button>
+            <div class="header-title">3D Plejer</div>
+            <button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M6,13H18V11H6M6,17H18V15H6M6,9H18V7H6V9Z"/></svg></button>
         </div>
 
         <div class="album-art-wrapper">
             <div class="album-art">
-                <div class="album-art-fallback" id="fallback-art"></div>
+                <div class="album-art-fallback" id="fallback-art">
+                    <svg viewBox="0 0 24 24" style="width:45px; height:45px; color:var(--font-light);"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,22M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7A2.5,2.5 0 0,0 10,9.5V14.5A2.5,2.5 0 0,0 12.5,17A2.5,2.5 0 0,0 15,14.5V9.5A2.5,2.5 0 0,0 12.5,7Z"/></svg>
+                </div>
                 <video class="album-video" id="player-video" loop playsinline webkit-playsinline></video>
             </div>
         </div>
 
         <div class="track-info">
-            <div class="track-title" id="display-title">Nema pesama</div>
-            <div class="track-artist" id="display-artist">Uvezi lokalne MP3 / Video</div>
+            <div class="track-title" id="display-title">Nema medija</div>
+            <div class="track-artist" id="display-artist">Uvezi fajlove na desnom ekranu</div>
         </div>
 
         <div class="progress-container">
@@ -426,41 +467,68 @@
         </div>
 
         <div class="controls">
-            <button class="control-btn" id="btn-prev">
-                <svg viewBox="0 0 24 24"><path d="M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z"/></svg>
-            </button>
+            <button class="control-btn" id="btn-prev"><svg viewBox="0 0 24 24"><path d="M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z"/></svg></button>
             <button class="control-btn play-main" id="btn-play">
-                <svg viewBox="0 0 24 24" id="play-icon"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+                <svg viewBox="0 0 24 24" id="play-icon" style="width:22px; height:22px;"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
             </button>
-            <button class="control-btn" id="btn-next">
-                <svg viewBox="0 0 24 24"><path d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z"/></svg>
-            </button>
+            <button class="control-btn" id="btn-next"><svg viewBox="0 0 24 24"><path d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z"/></svg></button>
         </div>
     </div>
 
     <div class="player-card">
         <div class="header-nav">
-            <button class="nav-btn">
-                <svg viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg>
-            </button>
-            <div class="header-title">Mediji i Lista</div>
-            <button class="nav-btn">
-                <svg viewBox="0 0 24 24"><path d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"/></svg>
-            </button>
+            <div class="header-title" style="margin-left: auto; margin-right: auto;">Mediji i 3D Podešavanja</div>
         </div>
 
         <div class="upload-section">
-            <div class="file-selector-box">
-                <label for="file-upload" class="file-label" id="upload-label">🎵 Dodaj MP3</label>
-                <input type="file" id="file-upload" multiple accept="audio/mp3, audio/*">
-            </div>
-            <div class="file-selector-box">
-                <label for="video-upload" class="file-label" id="video-label">📹 Dodaj Video</label>
-                <input type="file" id="video-upload" accept="video/mp4, video/*">
-            </div>
+            <label class="custom-file-input" style="background: linear-gradient(135deg, #2a2d32, #1e2024); border: 1px solid #32363e;">
+                📁 Uvezi CEO FOLDER (Muzika + Video)
+                <input type="file" id="folder-upload" webkitdirectory directory multiple>
+            </label>
+            <label class="custom-file-input">
+                🎵 Izaberi pojedinačne MP3 pesme
+                <input type="file" id="file-upload" multiple accept="audio/*">
+            </label>
+            <label class="custom-file-input">
+                📹 Izaberi pojedinačne MP4 snimke
+                <input type="file" id="video-upload" multiple accept="video/*">
+            </label>
         </div>
 
         <div class="track-list" id="playlist-container"></div>
+
+        <div class="settings-panel">
+            <div class="slider-group">
+                <div class="color-picker-wrapper">
+                    <span style="font-size: 11px; font-weight:600;">Izaberi RGB Boju Svetla:</span>
+                    <input type="color" id="rgb-color" class="color-input" value="#ff3b00">
+                </div>
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Dubina / Isturenost Senki</span><span id="val-size">9px</span></div>
+                <input type="range" id="slide-size" class="native-slider" min="1" max="20" value="9">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Širina / Zamućenje (Blur)</span><span id="val-blur">16px</span></div>
+                <input type="range" id="slide-blur" class="native-slider" min="2" max="35" value="16">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Urez / Intenzitet Unutrašnjih Senki</span><span id="val-inset">3px</span></div>
+                <input type="range" id="slide-inset" class="native-slider" min="1" max="10" value="3">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Oštrina Tamne Senke</span><span id="val-dark">1.0</span></div>
+                <input type="range" id="slide-dark" class="native-slider" min="2" max="10" value="10">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Oštrina Svetle Senke</span><span id="val-light">1.0</span></div>
+                <input type="range" id="slide-light" class="native-slider" min="2" max="10" value="10">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Zaobljenost Ivica Plejera</span><span id="val-radius">40px</span></div>
+                <input type="range" id="slide-radius" class="native-slider" min="10" max="60" value="40">
+            </div>
+        </div>
     </div>
 
 </div>
@@ -471,16 +539,15 @@
     const audio = document.getElementById('audio-engine');
     const video = document.getElementById('player-video');
     const fallbackArt = document.getElementById('fallback-art');
+    const mainCard = document.getElementById('main-card');
     
     let playlist = [];
     let currentIndex = 0;
     let isPlaying = false;
-    let hasVideo = false;
 
+    const folderUpload = document.getElementById('folder-upload');
     const fileUpload = document.getElementById('file-upload');
     const videoUpload = document.getElementById('video-upload');
-    const uploadLabel = document.getElementById('upload-label');
-    const videoLabel = document.getElementById('video-label');
     const playlistContainer = document.getElementById('playlist-container');
     const displayTitle = document.getElementById('display-title');
     const displayArtist = document.getElementById('display-artist');
@@ -496,38 +563,76 @@
     const playPath = "M8,5.14V19.14L19,12.14L8,5.14Z";
     const pausePath = "M14,19H18V5H14M6,19H10V5H6V19Z";
 
-    // Video Audio Logika
-    videoUpload.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        video.src = URL.createObjectURL(file);
-        video.style.display = 'block';
-        fallbackArt.style.display = 'none';
-        hasVideo = true;
-        videoLabel.innerText = "📹 Video Učitan";
-        video.muted = isPlaying;
-        video.play().catch(() => {});
+    // OBRADA UVOZA CELOG FOLDERA
+    folderUpload.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        let addedCount = 0;
+
+        files.forEach((file) => {
+            const type = file.type;
+            const cleanName = file.name.replace(/\.[^/.]+$/, "");
+            
+            // Provera da li je audio
+            if (type.startsWith('audio/') || file.name.endsWith('.mp3') || file.name.endsWith('.wav') || file.name.endsWith('.m4a')) {
+                const parts = cleanName.split('-');
+                playlist.push({
+                    title: parts.length > 1 ? parts[1].trim() : parts[0].trim(),
+                    artist: parts.length > 1 ? parts[0].trim() : "Folder Muzika",
+                    url: URL.createObjectURL(file),
+                    type: 'audio'
+                });
+                addedCount++;
+            } 
+            // Provera da li je video
+            else if (type.startsWith('video/') || file.name.endsWith('.mp4') || file.name.endsWith('.mkv') || file.name.endsWith('.mov')) {
+                playlist.push({
+                    title: cleanName,
+                    artist: "Folder Video",
+                    url: URL.createObjectURL(file),
+                    type: 'video'
+                });
+                addedCount++;
+            }
+        });
+
+        if (addedCount > 0) {
+            currentIndex = playlist.length - addedCount;
+            loadTrack(currentIndex);
+            renderPlaylist();
+        }
     });
 
-    // MP3 Logika
+    // POJEDINAČNI UNOS MUZIKE
     fileUpload.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
-        if (files.length === 0) return;
-        playlist = [];
-        files.forEach((file, index) => {
+        files.forEach((file) => {
             const cleanName = file.name.replace(/\.[^/.]+$/, "");
             const parts = cleanName.split('-');
             playlist.push({
-                id: index,
                 title: parts.length > 1 ? parts[1].trim() : parts[0].trim(),
-                artist: parts.length > 1 ? parts[0].trim() : "Nepoznat Izvođač",
-                url: URL.createObjectURL(file)
+                artist: parts.length > 1 ? parts[0].trim() : "Muzička numera",
+                url: URL.createObjectURL(file),
+                type: 'audio'
             });
         });
-        currentIndex = 0;
+        if(playlist.length === files.length) { currentIndex = 0; loadTrack(currentIndex); }
         renderPlaylist();
-        loadTrack(currentIndex);
-        uploadLabel.innerText = `🎵 (${playlist.length})`;
+    });
+
+    // POJEDINAČNI UNOS VIDEO SNIMAKA
+    videoUpload.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        files.forEach((file) => {
+            const cleanName = file.name.replace(/\.[^/.]+$/, "");
+            playlist.push({
+                title: cleanName,
+                artist: "Video Snimak",
+                url: URL.createObjectURL(file),
+                type: 'video'
+            });
+        });
+        if(playlist.length === files.length) { currentIndex = 0; loadTrack(currentIndex); }
+        renderPlaylist();
     });
 
     function renderPlaylist() {
@@ -536,55 +641,113 @@
             const row = document.createElement('div');
             row.className = `list-item ${index === currentIndex ? 'active' : ''}`;
             row.innerHTML = `
-                <div class="item-details"><span class="item-title">${track.title}</span><span class="item-artist">${track.artist}</span></div>
-                <div class="item-play-status"><svg viewBox="0 0 24 24" style="width:12px; height:12px;"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg></div>
+                <div class="item-details">
+                    <span class="item-title">${track.title}</span>
+                    <span class="item-type">${track.type === 'video' ? '📹 ' + track.artist : '🎵 ' + track.artist}</span>
+                </div>
+                <div style="color: var(--accent-color); font-size:11px;">${index === currentIndex && isPlaying ? '►' : ''}</div>
             `;
-            row.addEventListener('click', () => { currentIndex = index; loadTrack(currentIndex); playAudio(); });
+            row.addEventListener('click', () => { currentIndex = index; loadTrack(currentIndex); playMedia(); });
             playlistContainer.appendChild(row);
         });
     }
 
     function loadTrack(index) {
         if (!playlist[index]) return;
-        audio.src = playlist[index].url;
-        displayTitle.innerText = playlist[index].title;
-        displayArtist.innerText = playlist[index].artist;
+        
+        audio.pause();
+        video.pause();
+        
+        const current = playlist[index];
+        displayTitle.innerText = current.title;
+        displayArtist.innerText = current.artist;
+
+        if (current.type === 'video') {
+            video.src = current.url;
+            video.style.display = 'block';
+            fallbackArt.style.display = 'none';
+            video.ontimeupdate = updateProgressLayoutVideo;
+        } else {
+            audio.src = current.url;
+            video.style.display = 'none';
+            fallbackArt.style.display = 'flex';
+            video.src = '';
+            audio.ontimeupdate = updateProgressLayoutAudio;
+        }
+
         const items = playlistContainer.querySelectorAll('.list-item');
         items.forEach(item => item.classList.remove('active'));
         if (items[index]) items[index].classList.add('active');
         progressBar.style.width = '0%';
     }
 
-    function playAudio() {
+    function playMedia() {
         if (playlist.length === 0) return;
         isPlaying = true;
-        audio.play().catch(() => {});
         playIcon.setAttribute('d', pausePath);
-        if (hasVideo) { video.muted = true; video.play().catch(() => {}); }
+        mainCard.classList.add('playing-glow');
+
+        if (playlist[currentIndex].type === 'video') {
+            video.play().catch(() => {});
+        } else {
+            audio.play().catch(() => {});
+        }
     }
 
-    function pauseAudio() {
+    function pauseMedia() {
         isPlaying = false;
-        audio.pause();
         playIcon.setAttribute('d', playPath);
-        if (hasVideo) { video.muted = false; video.play().catch(() => {}); }
+        mainCard.classList.remove('playing-glow');
+        audio.pause();
+        video.pause();
     }
 
-    btnPlay.addEventListener('click', () => isPlaying ? pauseAudio() : playAudio());
-    btnNext.addEventListener('click', () => { currentIndex = (currentIndex + 1) % playlist.length; loadTrack(currentIndex); if (isPlaying) playAudio(); });
-    btnPrev.addEventListener('click', () => { currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; loadTrack(currentIndex); if (isPlaying) playAudio(); });
-    audio.addEventListener('ended', () => { currentIndex = (currentIndex + 1) % playlist.length; loadTrack(currentIndex); playAudio(); });
+    btnPlay.addEventListener('click', () => isPlaying ? pauseMedia() : playMedia());
+    
+    function nextMedia() {
+        if(playlist.length === 0) return;
+        currentIndex = (currentIndex + 1) % playlist.length;
+        loadTrack(currentIndex);
+        if (isPlaying) playMedia();
+    }
 
-    audio.addEventListener('timeupdate', () => {
+    function prevMedia() {
+        if(playlist.length === 0) return;
+        currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+        loadTrack(currentIndex);
+        if (isPlaying) playMedia();
+    }
+
+    btnNext.addEventListener('click', nextMedia);
+    btnPrev.addEventListener('click', prevMedia);
+    
+    audio.addEventListener('ended', nextMedia);
+    video.addEventListener('ended', nextMedia);
+
+    function updateProgressLayoutAudio() {
         if (audio.duration) {
             progressBar.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
             currentTimeEl.innerText = formatTime(audio.currentTime);
             durationTimeEl.innerText = formatTime(audio.duration);
         }
-    });
+    }
+
+    function updateProgressLayoutVideo() {
+        if (video.duration) {
+            progressBar.style.width = `${(video.currentTime / video.duration) * 100}%`;
+            currentTimeEl.innerText = formatTime(video.currentTime);
+            durationTimeEl.innerText = formatTime(video.duration);
+        }
+    }
 
     sliderBox.addEventListener('click', (e) => {
-        if (audio.duration) audio.currentTime = (e.offsetX / sliderBox.clientWidth) * audio.duration;
+        if (playlist.length === 0) return;
+        const current = playlist[currentIndex];
+        if (current.type === 'video' && video.duration) {
+            video.currentTime = (e.offsetX / sliderBox.clientWidth) * video.duration;
+        } else if (current.type === 'audio' && audio.duration) {
+            audio.currentTime = (e.offsetX / sliderBox.clientWidth) * audio.duration;
+        }
     });
 
     function formatTime(s) {
@@ -592,13 +755,52 @@
         return `${m}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
-    // Registracija eksternog Service Worker fajla
+    // ŽIVA KONTROLA KLIZAČA
+    const root = document.documentElement;
+
+    document.getElementById('rgb-color').addEventListener('input', (e) => {
+        const hex = e.target.value;
+        root.style.setProperty('--accent-color', hex);
+        const r = parseInt(hex.slice(1,3), 16);
+        const g = parseInt(hex.slice(3,5), 16);
+        const b = parseInt(hex.slice(5,7), 16);
+        root.style.setProperty('--accent-blur', `rgba(${r}, ${g}, ${b}, 0.25)`);
+    });
+
+    document.getElementById('slide-size').addEventListener('input', (e) => {
+        root.style.setProperty('--shadow-size', e.target.value + 'px');
+        document.getElementById('val-size').innerText = e.target.value + 'px';
+    });
+
+    document.getElementById('slide-blur').addEventListener('input', (e) => {
+        root.style.setProperty('--shadow-blur', e.target.value + 'px');
+        document.getElementById('val-blur').innerText = e.target.value + 'px';
+    });
+
+    document.getElementById('slide-inset').addEventListener('input', (e) => {
+        root.style.setProperty('--shadow-inset-intensity', e.target.value + 'px');
+        document.getElementById('val-inset').innerText = e.target.value + 'px';
+    });
+
+    document.getElementById('slide-dark').addEventListener('input', (e) => {
+        const val = e.target.value / 10;
+        root.style.setProperty('--shadow-dark-opacity', val);
+        document.getElementById('val-dark').innerText = val;
+    });
+
+    document.getElementById('slide-light').addEventListener('input', (e) => {
+        const val = e.target.value / 10;
+        root.style.setProperty('--shadow-light-opacity', val);
+        document.getElementById('val-light').innerText = val;
+    });
+
+    document.getElementById('slide-radius').addEventListener('input', (e) => {
+        root.style.setProperty('--card-radius', e.target.value + 'px');
+        document.getElementById('val-radius').innerText = e.target.value + 'px';
+    });
+
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('PWA Service Worker uspešno registrovan!'))
-            .catch(err => console.log('Greška pri registraciji SW:', err));
-        });
+        window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
     }
 </script>
 </body>
